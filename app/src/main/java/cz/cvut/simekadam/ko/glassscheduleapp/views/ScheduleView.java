@@ -55,7 +55,7 @@ public class ScheduleView implements DirectRenderingCallback {
 			Observable.from(users).subscribe(new Action1<User>() {
 				@Override
 				public void call(User user) {
-					mScheduleFrameView.addUser(user.getAvatarUrl());
+					mScheduleFrameView.addUser(user.getPicture());
 				}
 			});
 		}
@@ -158,11 +158,7 @@ public class ScheduleView implements DirectRenderingCallback {
 
 	}
 
-	/**
-	 * Requests that the views redo their layout. This must be called manually every time the
-	 * tips view's text is updated because this layout doesn't exist in a GUI thread where those
-	 * requests will be enqueued automatically.
-	 */
+
 	private void doLayout() {
 		// Measure and update the layout so that it will take up the entire surface space
 		// when it is drawn.
@@ -198,31 +194,21 @@ public class ScheduleView implements DirectRenderingCallback {
 		}
 	}
 
-	/**
-	 * Redraws the compass in the background.
-	 */
+
 	private class RenderThread extends Thread {
 		private boolean mShouldRun;
 
-		/**
-		 * Initializes the background rendering thread.
-		 */
+
 		public RenderThread() {
 			mShouldRun = true;
 		}
 
-		/**
-		 * Returns true if the rendering thread should continue to run.
-		 *
-		 * @return true if the rendering thread should continue to run
-		 */
+
 		private synchronized boolean shouldRun() {
 			return mShouldRun;
 		}
 
-		/**
-		 * Requests that the rendering thread exit at the next opportunity.
-		 */
+
 		public synchronized void quit() {
 			mShouldRun = false;
 		}

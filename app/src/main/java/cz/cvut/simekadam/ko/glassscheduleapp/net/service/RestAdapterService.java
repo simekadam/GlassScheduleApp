@@ -5,7 +5,6 @@ import java.util.List;
 import android.content.Context;
 
 import cz.cvut.simekadam.ko.glassscheduleapp.model.entities.Event;
-import cz.cvut.simekadam.ko.glassscheduleapp.model.entities.User;
 import retrofit.RestAdapter;
 import rx.Observable;
 
@@ -18,14 +17,13 @@ public class RestAdapterService{
 
 	public RestAdapterService(Context context) {
 		mScheduleService = new RestAdapter.Builder()
+			.setLogLevel(RestAdapter.LogLevel.FULL)
 			.setEndpoint("http://www.json-generator.com/")
 			.build()
 			.create(ScheduleService.class);
 	}
 
-	public Observable<List<User>> getUserObservable(){
-		return mScheduleService.getUsers();
-	}
+
 	public Observable<List<Event>> getEventsObservable(){
 		return mScheduleService.getEvents();
 	}

@@ -7,7 +7,7 @@ import android.view.SurfaceHolder;
 
 import com.google.android.glass.timeline.DirectRenderingCallback;
 import cz.cvut.simekadam.ko.glassscheduleapp.model.entities.User;
-import cz.cvut.simekadam.ko.glassscheduleapp.net.service.RestAdapterService;
+import cz.cvut.simekadam.ko.glassscheduleapp.net.service.UsersAdapterService;
 import cz.cvut.simekadam.ko.glassscheduleapp.views.ScheduleView;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,8 +33,6 @@ public class ScheduleRenderer implements DirectRenderingCallback {
 			}
 
 
-
-
 			@Override
 			public void onAccuracyChanged(OrientationManager orientationManager) {
 				mInterference = orientationManager.hasInterference();
@@ -43,7 +41,7 @@ public class ScheduleRenderer implements DirectRenderingCallback {
 		};
 
 	public ScheduleRenderer(Context context, OrientationManager orientationManager
-	                    ) {
+	) {
 
 
 		mContext = context;
@@ -75,8 +73,8 @@ public class ScheduleRenderer implements DirectRenderingCallback {
 
 	}
 
-	public Observable<List<User>> updateUsers(RestAdapterService service){
-		Observable<List<User>> userObservable = service.getUserObservable();
+	public Observable<List<User>> updateUsers(UsersAdapterService service) {
+		Observable<List<User>> userObservable = service.getUserObservable(5);
 		userObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(mScheduleView.getUserListSubscriber());
 		return userObservable;
 	}

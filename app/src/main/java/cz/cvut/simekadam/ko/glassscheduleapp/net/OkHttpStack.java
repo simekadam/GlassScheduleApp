@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.util.Log;
+
 /**
  * An {@link com.android.volley.toolbox.HttpStack HttpStack} implementation which
  * uses OkHttp as its transport.
@@ -21,6 +23,7 @@ public class OkHttpStack extends HurlStack {
 	}
 
 	public OkHttpStack(OkHttpClient client) {
+		Log.d("prdel", "test");
 		if (client == null) {
 			throw new NullPointerException("Client must not be null.");
 		}
@@ -28,6 +31,7 @@ public class OkHttpStack extends HurlStack {
 	}
 
 	@Override protected HttpURLConnection createConnection(URL url) throws IOException {
+		Log.d("test", "connecting");
 		return client.open(url);
 	}
 }

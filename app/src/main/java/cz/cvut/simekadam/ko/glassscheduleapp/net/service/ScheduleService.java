@@ -14,8 +14,7 @@ import rx.Observable;
 public interface ScheduleService {
 
 
-	@GET("/j/cdraSwieCq/")
-	Observable<List<User>> getUsers();
+
 
 	@POST("/j/cbpcnzVfKG/")
 	Observable<List<Event>> getEvents();

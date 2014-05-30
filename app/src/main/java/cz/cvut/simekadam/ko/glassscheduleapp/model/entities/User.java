@@ -7,45 +7,57 @@ import java.util.List;
  */
 public class User {
 
-	private String name;
-	private String avatarUrl;
-	private String initials;
-	private int id;
+	private String gender;
+	private Name name;
+	private Location location;
+	private String email;
+	private String picture;
 
-
-	public User(String name,String initials, String avatarUrl, int id) {
-		this.initials = initials;
+	public User(String gender, Name name, Location location, String email, String picture) {
+		this.gender = gender;
 		this.name = name;
-		this.avatarUrl = avatarUrl;
-		this.id = id;
+		this.location = location;
+		this.email = email;
+		this.picture = picture;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getGender() {
+		return gender;
 	}
 
-	public void setAvatarUrl(String avatarUrl) {
-		this.avatarUrl = avatarUrl;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
-	public void setInitials(String initials) {
-		this.initials = initials;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getName() {
+	public Name getName() {
 		return name;
 	}
 
-
-	public String getAvatarUrl() {
-		return avatarUrl;
+	public void setName(Name name) {
+		this.name = name;
 	}
 
-	public int getId() {
-		return id;
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 }
