@@ -18,7 +18,7 @@ public class RestAdapterService{
 	public RestAdapterService(Context context) {
 		mScheduleService = new RestAdapter.Builder()
 			.setLogLevel(RestAdapter.LogLevel.FULL)
-			.setEndpoint("http://www.json-generator.com/")
+			.setEndpoint("http://h3t.cz/glass/")
 			.build()
 			.create(ScheduleService.class);
 	}

@@ -16,8 +16,14 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/read_aloud"
-        android:title="reschedule"
-        android:icon="@android:drawable/ic_dialog_info"/>
+        android:id="@+id/reschedule"
+        android:title="Reschedule"
+        android:icon="@drawable/clock"/>
+
+	<item
+		android:id="@+id/switchControls"
+		android:title="Motion/touch"
+		android:icon="@drawable/touch"/>
+
 
 </menu>

@@ -12,7 +12,7 @@ import rx.Observable;
  */
 public interface UsersService {
 
-	@GET("/")
-	Observable<List<User>> getUsers(@Field("results") int countOfResults);
+	@GET("/users.json")
+	Observable<List<User>> getUsers();
 
 }

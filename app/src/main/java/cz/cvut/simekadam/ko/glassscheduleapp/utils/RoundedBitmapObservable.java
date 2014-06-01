@@ -16,26 +16,28 @@ public class RoundedBitmapObservable implements Observable.OnSubscribe<Bitmap> {
 	private final int RADIUS = 70;
 	private Bitmap mBitmap;
 	private Context mContext;
+	private String mInitials;
 
-	private RoundedBitmapObservable(Context context, Bitmap bitmap) {
+	private RoundedBitmapObservable(Context context, Bitmap bitmap, String initials) {
 		mBitmap = bitmap;
 		mContext = context;
+		mInitials = initials;
 	}
 
 
-	public static Observable<Bitmap> renderRoundedBitmap(Context context, Bitmap bitmap){
-		return Observable.create(new RoundedBitmapObservable(context, bitmap));
+	public static Observable<Bitmap> renderRoundedBitmap(Context context, Bitmap bitmap, String initials){
+		return Observable.create(new RoundedBitmapObservable(context, bitmap, initials));
 	}
 
 	@Override
 	public void call(Subscriber<? super Bitmap> subscriber) {
-		Bitmap croppedBitmap = getCroppedBitmap(mBitmap, RADIUS);
+		Bitmap croppedBitmap = getCroppedBitmap(mBitmap, RADIUS, mInitials);
 		subscriber.onNext(croppedBitmap);
 	}
 
 
-	public Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
-
+	public Bitmap getCroppedBitmap(Bitmap bmp, int radius, String initials) {
+		initials = initials.toUpperCase();
 		Bitmap sbmp;
 		int oldWidth = bmp.getWidth();
 		int oldWHeight = bmp.getHeight();
@@ -50,8 +52,9 @@ public class RoundedBitmapObservable implements Observable.OnSubscribe<Bitmap> {
 			sbmp = bmp;
 		Bitmap output = Bitmap.createBitmap(sbmp.getWidth(),
 			sbmp.getHeight(), Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
 
+		Canvas canvas = new Canvas(output);
+		canvas.drawColor(Color.TRANSPARENT);
 		final Paint paint = new Paint();
 		final Paint paint2 = new Paint();
 		final Paint initialsPaint = new Paint();
@@ -70,6 +73,7 @@ public class RoundedBitmapObservable implements Observable.OnSubscribe<Bitmap> {
 		paint2.setStrokeWidth(2);
 		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(Color.WHITE);
+		paint.setStyle(Paint.Style.FILL);
 		paint2.setColor(mContext.getResources().getColor(R.color.light_gray));
 		paint2.setStyle(Paint.Style.STROKE);
 
@@ -86,21 +90,20 @@ public class RoundedBitmapObservable implements Observable.OnSubscribe<Bitmap> {
 		initialsPaint.setAntiAlias(true);
 		initialsPaint.setTypeface(fontRoboThin);
 
+
+
+		canvas.drawBitmap(sbmp, rect, rect, paint);
+
+		canvas.drawRect(rect, paint2);
+
+		canvas.drawRect(rect, initialsShadowPaint);
+
+		float measureText = initialsPaint.measureText(initials);
+
+		canvas.drawText(initials, sbmp.getWidth() / 2 - measureText/2,sbmp.getHeight()/2 + 15, initialsPaint);
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
 		canvas.drawCircle(sbmp.getWidth() / 2, sbmp.getHeight() / 2,
 			sbmp.getWidth() / 2 - 1, paint);
-
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(sbmp, rect, rect, paint);
-		canvas.drawCircle(sbmp.getWidth() / 2, sbmp.getHeight() / 2,
-			sbmp.getWidth() / 2 - 2, paint2);
-
-		canvas.drawCircle(sbmp.getWidth() / 2, sbmp.getHeight() / 2,
-			sbmp.getWidth() / 2 - 1, initialsShadowPaint);
-
-		float measureText = initialsPaint.measureText("JN");
-
-		canvas.drawText("JN", sbmp.getWidth() / 2 - measureText/2,sbmp.getHeight()/2 + 15, initialsPaint);
-
 		return output;
 	}
 }

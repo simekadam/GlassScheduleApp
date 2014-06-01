@@ -18,13 +18,13 @@ public class UsersAdapterService {
 	public UsersAdapterService(Context context) {
 		mUsersService = new RestAdapter.Builder()
 			.setLogLevel(RestAdapter.LogLevel.FULL)
-			.setEndpoint("http://api.randomuser.me/")
+			.setEndpoint("http://h3t.cz/glass/")
 			.build()
 			.create(UsersService.class);
 	}
 
 	public Observable<List<User>> getUserObservable(int count){
-		return mUsersService.getUsers(count);
+		return mUsersService.getUsers();
 	}
 
 }

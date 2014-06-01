@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import cz.cvut.simekadam.ko.glassscheduleapp.App;
 import cz.cvut.simekadam.ko.glassscheduleapp.R;
+import cz.cvut.simekadam.ko.glassscheduleapp.model.entities.User;
 import cz.cvut.simekadam.ko.glassscheduleapp.utils.RoundedBitmapObservable;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -71,15 +72,18 @@ public class ScheduleFrameView extends View {
 		}
 	}
 
-	public void addUser(String avatarUrl){
-		mPositions.put(avatarUrl, mPositions.size());
-		mImageLoader.get(avatarUrl, new ProfileImageLoadedListener());
+	public void addUser(User user){
+		if(user.getPicture()==null){
+			return;
+		}
+		mPositions.put(user.getPicture(), mPositions.size());
+		mImageLoader.get(user.getPicture(), new ProfileImageLoadedListener(user));
 
 	}
 
-	private void renderUserAvatar(Bitmap bitmap,final String requestUrl) {
-
-		Observable<Bitmap> bitmapObservable = RoundedBitmapObservable.renderRoundedBitmap(mContext, bitmap);
+	private void renderUserAvatar(Bitmap bitmap,final String requestUrl, User user) {
+		String initials = user.getName().getFirst().substring(0,1)+user.getName().getLast().substring(0,1);
+		Observable<Bitmap> bitmapObservable = RoundedBitmapObservable.renderRoundedBitmap(mContext, bitmap, initials);
 		bitmapObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Bitmap>() {
 			@Override
 			public void call(Bitmap bitmap) {
@@ -97,9 +101,15 @@ public class ScheduleFrameView extends View {
 
 	private class ProfileImageLoadedListener implements ImageLoader.ImageListener {
 
+		private User mUser;
+
+		private ProfileImageLoadedListener(User user) {
+			mUser = user;
+		}
+
 		@Override
 		public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-			renderUserAvatar(response.getBitmap(), response.getRequestUrl());
+			renderUserAvatar(response.getBitmap(), response.getRequestUrl(), mUser);
 		}
 
 		@Override

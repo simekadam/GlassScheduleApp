@@ -14,9 +14,7 @@ import rx.Observable;
 public interface ScheduleService {
 
 
-
-
-	@POST("/j/cbpcnzVfKG/")
+	@POST("/events.json")
 	Observable<List<Event>> getEvents();
 
 

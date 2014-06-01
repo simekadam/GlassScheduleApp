@@ -47,7 +47,7 @@ public class ScheduleView implements DirectRenderingCallback {
 
 		@Override
 		public void onError(Throwable e) {
-
+				Log.d("", "events error" + e.getMessage());
 		}
 
 		@Override
@@ -55,7 +55,8 @@ public class ScheduleView implements DirectRenderingCallback {
 			Observable.from(users).subscribe(new Action1<User>() {
 				@Override
 				public void call(User user) {
-					mScheduleFrameView.addUser(user.getPicture());
+					Log.d("user added", user.toString());
+					mScheduleFrameView.addUser(user);
 				}
 			});
 		}
@@ -68,7 +69,7 @@ public class ScheduleView implements DirectRenderingCallback {
 
 		@Override
 		public void onError(Throwable e) {
-			Log.d("test", "events error" + e.getMessage());
+			Log.d("", "events error" + e.getMessage());
 		}
 
 		@Override
@@ -76,7 +77,6 @@ public class ScheduleView implements DirectRenderingCallback {
 			Observable.from(events).subscribe(new Action1<Event>() {
 				@Override
 				public void call(Event event) {
-					Log.d("testtest", event.getStartHour()+"");
 					mTaskScheduleView.addEvent(event);
 				}
 			});
@@ -108,6 +108,7 @@ public class ScheduleView implements DirectRenderingCallback {
 		LayoutInflater inflater = LayoutInflater.from(context);
 		mLayout = (FrameLayout)inflater.inflate(R.layout.schedule_layout, null);
 		ButterKnife.inject(this, mLayout);
+
 	}
 
 	public Observable<SurfaceHolder> getHolderObservable() {
@@ -115,11 +116,11 @@ public class ScheduleView implements DirectRenderingCallback {
 	}
 
 	public void setHeading(float heading) {
-		if (mHolder == null) return;
-		Canvas canvas = mHolder.lockCanvas();
-		Log.d("test", heading + "");
-		mHolder.unlockCanvasAndPost(canvas);
-		mTaskScheduleView.setHeading(heading);
+		mTaskScheduleView.setOffset(heading);
+	}
+
+	public void setAbsoluteHeading(float absoluteHeading){
+		mTaskScheduleView.setAbsoluteOffset(absoluteHeading);
 	}
 
 	public Subscriber<List<User>> getUserListSubscriber() {
@@ -176,20 +177,16 @@ public class ScheduleView implements DirectRenderingCallback {
 	 */
 	private synchronized void repaint() {
 		Canvas canvas = null;
-
 		try {
 			canvas = mHolder.lockCanvas();
 		} catch (RuntimeException e) {
 
 		}
-
 		if (canvas != null) {
 			mLayout.draw(canvas);
-
 			try {
 				mHolder.unlockCanvasAndPost(canvas);
 			} catch (RuntimeException e) {
-
 			}
 		}
 	}
@@ -218,10 +215,10 @@ public class ScheduleView implements DirectRenderingCallback {
 			while (shouldRun()) {
 				long frameStart = SystemClock.elapsedRealtime();
 				repaint();
-				long frameLength = SystemClock.elapsedRealtime() - frameStart;
-				Log.d("draw", "drawing "+frameLength);
+				long duration = SystemClock.elapsedRealtime() - frameStart;
+//				Log.d("draw", "drawing "+duration);
 
-				long sleepTime = FRAME_TIME_MILLIS - frameLength;
+				long sleepTime = FRAME_TIME_MILLIS - duration;
 				if (sleepTime > 0) {
 					SystemClock.sleep(sleepTime);
 				}

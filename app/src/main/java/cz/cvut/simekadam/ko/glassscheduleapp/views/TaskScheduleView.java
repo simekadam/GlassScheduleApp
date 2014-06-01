@@ -8,7 +8,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.*;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
@@ -24,7 +26,8 @@ import rx.functions.Action1;
 public class TaskScheduleView extends View {
 
 	private final Paint mBottomShadowPaint;
-	private float heading;
+	private final Paint mTextPaintNumbers;
+	private float offset;
 	private float mAnimatedHeading;
 	private static final float MIN_DISTANCE_TO_ANIMATE = 15.0f;
 
@@ -60,6 +63,14 @@ public class TaskScheduleView extends View {
 		mTextPaint.setTextSize(30);
 		mTextPaint.setAntiAlias(true);
 
+		mTextPaintNumbers = new Paint();
+		mTextPaintNumbers.setColor(Color.WHITE);
+		mTextPaintNumbers.setStyle(Paint.Style.FILL);
+		mTextPaintNumbers.setShadowLayer(2, 0, 0, Color.GRAY);
+		mTextPaintNumbers.setTypeface(Typeface.DEFAULT);
+		mTextPaintNumbers.setTextSize(30);
+		mTextPaintNumbers.setAntiAlias(true);
+
 		mVerticalLinePaint = new Paint();
 		mVerticalLinePaint.setColor(Color.WHITE);
 		mVerticalLinePaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -77,35 +88,18 @@ public class TaskScheduleView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-
-
-
-		float pixelsPerDegree = getWidth()/10f;
-		float centerX = getWidth() / 2.0f;
-		float centerY = getHeight() / 2.0f;
-
-
-
 		canvas.save();
-		float v = -heading * pixelsPerDegree + centerX;
-		if( v < 0){
-			v = 0;
-		}else if(v > 640 * 4) {
-			v = 640;
-		}
-			canvas.translate(v, 0);
-
-				drawEvents(canvas);
-
-
-
-
+		float v = -offset;
+		canvas.translate(v, 0);
+		drawEvents(canvas);
 		canvas.restore();
 
 	}
 
 
 	private void drawEvents(final Canvas canvas){
+		long frameStart = SystemClock.elapsedRealtime();
+
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
 		canvas.save();
@@ -113,28 +107,47 @@ public class TaskScheduleView extends View {
 		final float height = canvas.getHeight()/4;
 		final float width = canvas.getWidth()/8;
 
+		float xStartPos;
+
 		for(int i = 0; i < 24; i++){
-			canvas.drawLine(i*width, 0, i*width, getHeight(), mVerticalLinePaint);
+			xStartPos = (i*width);
+			if(xStartPos > offset && xStartPos < offset+640) {
+					canvas.drawLine(i * width, 0, i * width, getHeight()-30, mVerticalLinePaint);
+
+
+			}
 		}
 		Observable.from(mEventList).subscribe(new Action1<Event>() {
 			@Override
 			public void call(Event event) {
 				for (int i = 0; i < 4; i++) {
 					mPaint.setColor((getColor((event.getStartHour()+i)%6)));
-					canvas.drawRect((event.getStartHour()+i) * width + 5, i * height + 10, (event.getEndHour()+i) * width - 5, (i + 1) * height - 10, mPaint);
-					canvas.drawText(event.getName().substring(0, 5).toUpperCase(), (event.getStartHour()+i) * width + 35, i * height + 10 + height / 2, mTextPaint);
+					float xStartPos = ((event.getStartHour()+i)*width);
+
+					if(xStartPos+80 > offset && xStartPos < offset+720){
+						canvas.drawRect(xStartPos + 5, i * height + 10, (event.getEndHour()+i) * width - 5, (i + 1) * height - 10, mPaint);
+						canvas.drawText(event.getName().substring(0, 5).toUpperCase(), xStartPos + 35, i * height + 10 + height / 2, mTextPaint);
+					}
+
 				}
 
 			}
 		});
 		canvas.drawRect(0, getHeight()-100, getWidth(), getHeight(), mBottomShadowPaint);
 		for(int i = 0; i < 24; i++){
-			float v = mTextPaint.measureText(String.valueOf(i));
-			canvas.drawText(String.valueOf(i), i * width-v/2, getHeight(), mTextPaint);
+			xStartPos = (i*width);
+			if(xStartPos > offset && xStartPos < offset+640) {
+				float v = mTextPaintNumbers.measureText(String.valueOf(i));
+
+				canvas.drawText(String.valueOf(i), i * width - v / 2, getHeight(), mTextPaintNumbers);
+			}
 		}
 
 		mCanvasUpToDate = true;
 		canvas.restore();
+		long duration = SystemClock.elapsedRealtime() - frameStart;
+//		Log.d("drawing events", duration+"ms");
+
 	}
 
 
@@ -144,10 +157,27 @@ public class TaskScheduleView extends View {
 		invalidate();
 	}
 
-	public void setHeading(float heading) {
-		this.heading = heading;
-		animateTo(heading);
+	public void setAbsoluteOffset(float absoluteOffset){
+		if(absoluteOffset<0){
+			this.offset = 0;
+		}else if(absoluteOffset > 640*2){
+			this.offset = 640*2;
+		}else{
+			this.offset = absoluteOffset;
+		}
+		animateTo(this.offset);
+	}
 
+	public void setOffset(float offset) {
+		float tmpOffset = this.offset+offset;
+		if(tmpOffset<0){
+			this.offset = 0;
+		}else if(tmpOffset > 640*2){
+			this.offset = 640*2;
+		}else{
+			this.offset = tmpOffset;
+		}
+		animateTo(this.offset);
 	}
 
 	private int getColor(int climbCategory) {
@@ -225,13 +255,13 @@ public class TaskScheduleView extends View {
 		// continued to move to a different orientation than the original destination angle of the
 		// animation. Since we can't easily change the animation goal while it is running, we call
 		// animateTo() again, which will either redraw at the new orientation (if the difference is
-		// small enough), or start another animation to the new heading. This seems to produce
+		// small enough), or start another animation to the new offset. This seems to produce
 		// fluid results.
 		mAnimator.addListener(new AnimatorListenerAdapter() {
 
 			@Override
 			public void onAnimationEnd(Animator animator) {
-				animateTo(heading);
+				animateTo(offset);
 			}
 		});
 	}
