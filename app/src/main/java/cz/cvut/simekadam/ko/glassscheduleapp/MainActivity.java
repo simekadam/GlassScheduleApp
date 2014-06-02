@@ -96,8 +96,8 @@ public class MainActivity extends Activity {
 				if(mFloat == Float.MAX_VALUE){
 					mFloat = aFloat;
 				}else{
-					Log.d("moving head", aFloat+"");
-					mScheduleView.setAbsoluteHeading((aFloat) / 90 * (3 * 640));
+					mScheduleView.setHeading(-(mFloat-aFloat)*30 );
+					mFloat = aFloat;
 				}
 
 			}

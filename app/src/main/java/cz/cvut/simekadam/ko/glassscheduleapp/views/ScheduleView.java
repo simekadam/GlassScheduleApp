@@ -216,7 +216,7 @@ public class ScheduleView implements DirectRenderingCallback {
 				long frameStart = SystemClock.elapsedRealtime();
 				repaint();
 				long duration = SystemClock.elapsedRealtime() - frameStart;
-//				Log.d("draw", "drawing "+duration);
+				Log.d("draw", "drawing "+duration);
 
 				long sleepTime = FRAME_TIME_MILLIS - duration;
 				if (sleepTime > 0) {

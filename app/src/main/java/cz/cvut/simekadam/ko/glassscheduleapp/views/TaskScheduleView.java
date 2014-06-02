@@ -124,7 +124,7 @@ public class TaskScheduleView extends View {
 					mPaint.setColor((getColor((event.getStartHour()+i)%6)));
 					float xStartPos = ((event.getStartHour()+i)*width);
 
-					if(xStartPos+80 > offset && xStartPos < offset+720){
+					if(xStartPos+120 > offset && xStartPos < offset+760){
 						canvas.drawRect(xStartPos + 5, i * height + 10, (event.getEndHour()+i) * width - 5, (i + 1) * height - 10, mPaint);
 						canvas.drawText(event.getName().substring(0, 5).toUpperCase(), xStartPos + 35, i * height + 10 + height / 2, mTextPaint);
 					}
