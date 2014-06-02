@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
 					mFloat = aFloat;
 				}else{
 					Log.d("moving head", aFloat+"");
-					mScheduleView.setAbsoluteHeading((aFloat) / 60 * (3 * 640));
+					mScheduleView.setAbsoluteHeading((aFloat) / 90 * (3 * 640));
 				}
 
 			}
